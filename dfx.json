@@ -1,0 +1,27 @@
+{
+  "canisters": {
+    "to-do-icp-backend": {
+      "candid": "src/to-do-icp-backend/to-do-icp-backend.did",
+      "package": "to-do-icp-backend",
+      "type": "rust"
+    },
+    "to-do-icp-frontend": {
+      "dependencies": [
+        "to-do-icp-backend"
+      ],
+      "source": [
+        "src/to-do-icp-frontend/dist"
+      ],
+      "type": "assets",
+      "workspace": "to-do-icp-frontend"
+    }
+  },
+  "defaults": {
+    "build": {
+      "args": "",
+      "packtool": ""
+    }
+  },
+  "output_env_file": ".env",
+  "version": 1
+}
