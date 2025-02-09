@@ -1,3 +1,37 @@
+// tasks.did
+type RepeatCycle = variant { Daily; Weekly; Monthly; Yearly };
+type Task = record {
+  id: nat64;
+  title: text;
+  is_completed: bool;
+  is_important: bool;
+  due_date: opt nat64;
+  reminder: opt nat64;
+  repeat: opt RepeatCycle;
+  assigned_to: opt principal;
+};
+
+type TaskInput = record {
+  title: text;
+  is_important: opt bool;
+  due_date: opt nat64;
+  reminder: opt nat64;
+  repeat: opt RepeatCycle;
+  assigned_to: opt principal;
+};
+
+type UpdateTaskInput = record {
+  title: opt text;
+  is_completed: opt bool;
+  is_important: opt bool;
+  due_date: opt opt nat64;
+  reminder: opt opt nat64;
+  repeat: opt opt RepeatCycle;
+  assigned_to: opt opt principal;
+};
+
 service : {
-    "greet": (text) -> (text) query;
+  "add_task": (TaskInput) -> (nat64);
+  "update_task": (nat64, UpdateTaskInput) -> (variant { Ok; Err: text });
+  "get_all_tasks": () -> (vec Task) query;
 }
