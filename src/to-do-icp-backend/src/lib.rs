@@ -1,4 +1,5 @@
 use ic_cdk::{update, query};
+use ic_cdk::api::time;
 use candid::{CandidType, Principal};
 use std::collections::HashMap;
 use serde::{Serialize, Deserialize};
@@ -183,14 +184,72 @@ fn get_important_tasks() -> Vec<Task> {
     })
 }
 
-//get planned tasks
+//get planned tasks of future
 #[query]
 fn get_planned_tasks() -> Vec<Task> {
+    let now_seconds = ic_cdk::api::time() / 1_000_000_000; // Current UTC time in seconds
+
     TASKS.with(|tasks| {
         tasks.borrow()
             .values()
-            .filter(|task| task.due_date.is_some())
+            .filter(|task| {
+                // Include tasks with a due date in the future
+                task.due_date.map_or(false, |due_date| due_date > now_seconds)
+            })
             .cloned()
             .collect()
+    })
+}
+
+//get tasks assigned to the caller
+#[query]
+fn get_assigned_tasks() -> Vec<Task> {
+    let caller_principal = ic_cdk::caller(); // Get the principal of the current user
+
+    TASKS.with(|tasks| {
+        tasks.borrow()
+            .values()
+            .filter(|task| {
+                // Check if task is assigned to the caller
+                task.assigned_to.map_or(false, |assigned_principal| {
+                    assigned_principal == caller_principal
+                })
+            })
+            .cloned()
+            .collect()
+    })
+}
+
+// Function to count today's tasks
+#[query]
+fn count_today_tasks() -> u64 {
+    // Reuse date logic from get_today_tasks()
+    let now_seconds = ic_cdk::api::time() / 1_000_000_000;
+    let start_of_day = now_seconds - (now_seconds % 86400);
+    let end_of_day = start_of_day + 86399;
+
+    TASKS.with(|tasks| {
+        tasks.borrow()
+            .values()
+            .filter(|task| {
+                task.due_date.map_or(false, |due_date| {
+                    due_date >= start_of_day && due_date <= end_of_day
+                })
+            })
+            .count() as u64 // Return count as u64
+    })
+}
+
+
+// Function to delete a task by ID
+#[update]
+fn delete_task(id: u64) -> Result<(), String> {
+    TASKS.with(|tasks| {
+        let mut tasks = tasks.borrow_mut();
+        if tasks.remove(&id).is_none() {
+            Err("Task not found".to_string())
+        } else {
+            Ok(())
+        }
     })
 }

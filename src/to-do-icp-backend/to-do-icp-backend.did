@@ -39,4 +39,7 @@ service : {
   "get_today_tasks": () -> (vec Task) query;
   "get_important_tasks": () -> (vec Task) query;
   "get_planned_tasks": () -> (vec Task) query;
+  "get_assigned_tasks": () -> (vec Task) query;
+  "count_today_tasks": () -> (nat64) query;
+  "delete_task": (nat64) -> (variant { Ok; Err: text });
 }
