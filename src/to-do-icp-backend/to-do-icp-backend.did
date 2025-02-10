@@ -34,4 +34,8 @@ service : {
   "add_task": (TaskInput) -> (nat64);
   "update_task": (nat64, UpdateTaskInput) -> (variant { Ok; Err: text });
   "get_all_tasks": () -> (vec Task) query;
+  "get_completed_tasks": () -> (vec Task) query;
+  "get_active_tasks": () -> (vec Task) query;
+  "get_today_tasks": () -> (vec Task) query;
+  "get_important_tasks": () -> (vec Task) query;
 }

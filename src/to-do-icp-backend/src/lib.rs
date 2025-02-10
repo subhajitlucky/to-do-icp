@@ -122,3 +122,63 @@ fn get_all_tasks() -> Vec<Task> {
         tasks.borrow().values().cloned().collect()
     })
 }
+
+// Returns all tasks that are NOT completed
+#[query]
+fn get_active_tasks() -> Vec<Task> {
+    TASKS.with(|tasks| {
+        tasks.borrow()
+            .values()
+            .filter(|task| !task.is_completed)
+            .cloned()
+            .collect()
+    })
+}
+
+// Returns all completed tasks
+#[query]
+fn get_completed_tasks() -> Vec<Task> {
+    TASKS.with(|tasks| {
+        tasks.borrow()
+            .values()
+            .filter(|task| task.is_completed)
+            .cloned()
+            .collect()
+    })
+}
+
+//get today tasks
+#[query]
+fn get_today_tasks() -> Vec<Task> {
+    // Get current UTC time in seconds
+    let now_seconds = ic_cdk::api::time() / 1_000_000_000; // Convert nanoseconds to seconds
+
+    // Calculate start and end of today (UTC)
+    let start_of_day = now_seconds - (now_seconds % 86400); // 86400 seconds = 1 day
+    let end_of_day = start_of_day + 86399; // 23:59:59
+
+    TASKS.with(|tasks| {
+        tasks.borrow()
+            .values()
+            .filter(|task| {
+                // Check if task.due_date falls within today
+                task.due_date.map_or(false, |due_date| {
+                    due_date >= start_of_day && due_date <= end_of_day
+                })
+            })
+            .cloned()
+            .collect()
+    })
+}
+
+//getting important tasks
+#[query]
+fn get_important_tasks() -> Vec<Task> {
+    TASKS.with(|tasks| {
+        tasks.borrow()
+            .values()
+            .filter(|task| task.is_important)
+            .cloned()
+            .collect()
+    })
+}
