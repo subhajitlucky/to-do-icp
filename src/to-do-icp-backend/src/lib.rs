@@ -182,3 +182,15 @@ fn get_important_tasks() -> Vec<Task> {
             .collect()
     })
 }
+
+//get planned tasks
+#[query]
+fn get_planned_tasks() -> Vec<Task> {
+    TASKS.with(|tasks| {
+        tasks.borrow()
+            .values()
+            .filter(|task| task.due_date.is_some())
+            .cloned()
+            .collect()
+    })
+}

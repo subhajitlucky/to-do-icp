@@ -38,4 +38,5 @@ service : {
   "get_active_tasks": () -> (vec Task) query;
   "get_today_tasks": () -> (vec Task) query;
   "get_important_tasks": () -> (vec Task) query;
+  "get_planned_tasks": () -> (vec Task) query;
 }
